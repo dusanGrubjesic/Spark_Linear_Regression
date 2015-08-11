@@ -91,8 +91,6 @@ OHETrainData.cache() ##cache
 OHEValidationData = rawValidationData.map(lambda point: parseOHEPoint(point, ctrOHEDict, numCtrOHEFeats)) ##create validation labeled points
 OHEValidationData.cache()
 
-
-
 # running first model with fixed hyperparameters
 numIters = 50
 stepSize = 10.
@@ -178,6 +176,19 @@ print ('Features Validation Logloss:\n\tBaseline = {0:.3f}\n\tLogReg = {1:.3f}'
        .format(logLossValBase, bestLogLoss))
 
 print "---------------------/find best hyperparameters for logistic regression--------"
+
+print "-------------------predict on test data----------------------------------------"
+OHETestData = rawTestData.map(lambda point: parseOHEPoint(point, ctrOHEDict, numCtrOHEFeats))
+
+finalModel = LogisticRegressionWithSGD.train(OHETrainData, numIters, step=10., regParam=1e-3, regType=regType,intercept=includeIntercept)
+
+labelsAndPredsTest = OHETestData.map(lambda lp: (lp.label, finalModel.predict(lp.features)))
+
+print "number of observations in test data:"
+print labelsAndPredsTest.count() ## 10014
+print "number of true positives:"
+print labelsAndPredsTest.filter(lambda x: x[0] == x[1]).count() ## 7957
+
 
 sc.stop() ##stop context
 
