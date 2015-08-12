@@ -22,7 +22,7 @@ print "-------------------/parse text file-----------"
 
 print "-------------------RDD------------------------"
 rawData  = (sc
-            .parallelize(dacData, 1)  # Create an RDD
+            .parallelize(dacData, 4)  # Create an RDD
             .zipWithIndex()  # Enumerate lines
             .map(lambda (v, i): (i, v))  # Use line index as key
             .partitionBy(2, lambda i: not (i < 50026)) 
@@ -186,7 +186,7 @@ labelsAndPredsTest = OHETestData.map(lambda lp: (lp.label, finalModel.predict(lp
 
 print "number of observations in test data:"
 print labelsAndPredsTest.count() ## 10014
-print "number of true positives:"
+print "number of true positives + true negatives:"
 print labelsAndPredsTest.filter(lambda x: x[0] == x[1]).count() ## 7957
 
 
